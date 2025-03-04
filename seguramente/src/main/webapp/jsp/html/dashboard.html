@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - SeguraMente</title>
+    <link rel="stylesheet" href="css/dashboard.css">
+
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>SeguraMente</h1>
+            <a href="dashboard.html" class="sidebar-item">
+                <img src="imagens/jogos_disponiveis_icon.png" alt="Jogos Disponíveis" style="width: 20px; height: 20px;">
+                Jogos Disponíveis
+            </a>
+            <a href="missoes_semanais.html" class="sidebar-item">
+                <img src="imagens/missoes_icon.png" alt="Missões Semanais" style="width: 20px; height: 20px;">
+                Missões Semanais
+            </a>
+            <a href="historico.html" class="sidebar-item">
+                <img src="imagens/historico_icon.png" alt="Histórico" style="width: 20px; height: 20px;">
+                Histórico
+            </a>
+            <a href="#" class="sidebar-item" id="logout">
+                <img src="imagens/logout_icon.png" alt="Sair" style="width: 20px; height: 20px;">
+                Sair
+            </a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-container">
+                    <img src="imagens/lupa.png" alt="Lupa" class="search-icon">
+                    <input type="text" placeholder="Pesquisar...">
+                </div>
+                <a href="criar_quizz.html" class="create-quiz">Criar Quizz</a>
+                <a href="perfil.html" class="profile">
+                    <img src="imagens/avatar.png" alt="Avatar">
+                    <span>Pessoa</span>
+                </a>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="quiz-section">
+                <div class="quiz-header">
+                    <div class="user-info">
+                        <img src="imagens/avatar.png" alt="Avatar do usuário" class="user-avatar">
+                        <div class="user-details">
+                            <span class="user-name">Pessoa</span>
+                            <div class="user-score-container">
+                                <img src="imagens/flag_icon.png" alt="Flag Icon" class="flag-icon">
+                                <div class="user-score">
+                                    <span class="score-value">27</span>
+                                    <span class="score-text">Quiz Passed</span>
+                                </div>
+                            </div>
+                        </div>                                            
+                    </div>
+                </div>
+                
+                <a href="jogar_agora_registado.html" class="play-now-button">Jogar Agora</a>
+                
+                <!-- Quiz Cards -->
+                <div class="quiz-card">
+                    <img src="imagens/quiz-image.png" alt="Quiz">
+                    <div class="quiz-content">
+                        <div class="quiz-title">Segurança na Internet</div>
+                        <div class="quiz-description">
+                            Olá, crianças! Sabiam que podemos aprender a navegar na internet de forma segura e divertida? Este quiz é como um jogo que vos vai ensinar a reconhecer perigos online e a evitá-los.
+                        </div>
+                        <a href="jogar_quizz.html" class="quiz-button">Jogar</a>
+                    </div>
+                </div>
+                <div class="quiz-card">
+                    <img src="imagens/quiz-image.png" alt="Quiz">
+                    <div class="quiz-content">
+                        <div class="quiz-title">Segurança na Internet</div>
+                        <div class="quiz-description">
+                            Olá, crianças! Sabiam que podemos aprender a navegar na internet de forma segura e divertida? Este quiz é como um jogo que vos vai ensinar a reconhecer perigos online e a evitá-los.
+                        </div>
+                        <button class="quiz-button">Jogar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <h2>Tem certeza que deseja sair?</h2>
+                <div class="modal-buttons">
+                    <button class="btn-yes" id="confirmYes">Sim</button>
+                    <button class="btn-no" id="confirmNo">Não</button>
+                </div>
+            </div>
+        </div>
+
+    <script>
+        const logoutLink = document.getElementById('logout');
+        const modal = document.getElementById('modal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.add('show');
+        });
+
+        confirmYes.addEventListener('click', () => {
+            window.location.href = '../index.html';
+        });
+
+        confirmNo.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+    </script>
+</body>
+</html>

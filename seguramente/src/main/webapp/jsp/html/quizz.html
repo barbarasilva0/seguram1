@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quiz - SeguraMente</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(10deg, #1935CA, #6A88FF);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .quiz-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px;
+            text-align: center;
+            z-index: 2;
+            max-width: 900px;
+            width: 100%;
+            padding: 20px;
+        }
+
+        .quiz-header {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2C2C2C;
+        }
+
+        .quiz-options {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .quiz-option {
+            background: #E8E8E8;
+            border: none;
+            border-radius: 10px;
+            padding: 40px;
+            font-size: 24px;
+            font-weight: bold;
+            color: #6B35B4;
+            cursor: pointer;
+            transition: background 0.3s, transform 0.2s;
+        }
+
+        .quiz-option:hover {
+            background: #D6D6D6;
+            transform: scale(1.05);
+        }
+
+        .character-container {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            z-index: 1;
+            width: 700px;
+            height: auto;
+        }
+
+        .character {
+            width: 100%;
+            height: auto;
+        }
+
+        .next-button {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            background: #35B44A;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s;
+        }
+
+        .next-button:hover {
+            transform: scale(1.1);
+        }
+
+        .next-button img {
+            width: 24px;
+            height: 24px;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1935CA;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="logo">SeguraMente</div>
+
+    <div class="quiz-container">
+        <div class="quiz-header">Pergunta 1?</div>
+
+        <div class="quiz-options">
+            <button class="quiz-option">A</button>
+            <button class="quiz-option">B</button>
+            <button class="quiz-option">C</button>
+            <button class="quiz-option">D</button>
+        </div>
+    </div>
+
+    <div class="character-container">
+        <img src="imagens/Capturar1.png" alt="Personagem" class="character">
+    </div>
+
+    <button class="next-button" onclick="goToNextQuestion()">
+        <img src="imagens/arrow_right.png" alt="Próxima">
+    </button>
+
+    <script>
+        function goToNextQuestion() {
+            // Redireciona para a próxima pergunta ou finaliza o quiz
+            alert('Próxima pergunta ou finalizar quiz!');
+        }
+    </script>
+</body>
+</html>

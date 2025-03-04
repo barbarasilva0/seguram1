@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Missões Semanais - SeguraMente</title>
+    <link rel="stylesheet" href="css/admin_missoes.css">
+
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>SeguraMente</h1>
+            <a href="admin_aprovar_quizz.html" class="sidebar-item">Jogos/ Quizzes</a>
+            <a href="admin_missoes.html" class="sidebar-item active">Missões</a>
+            <a href="#" class="sidebar-item" id="logout">Sair</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-container">
+                    <input type="text" placeholder="Search Quiz">
+                </div>
+                <a href="admin_criar_quizz.html" class="create-quiz">Criar Quiz</a>
+                <a href="perfil.html" class="profile">
+                    <img src="imagens/avatar.png" alt="Avatar">
+                    <span>Pessoa</span>
+                </a>
+            </div>
+
+            <h1>Missões Semanais</h1>
+
+            <div class="missions-list">
+                <div class="mission-item">
+                    <span>Jogar um quizz</span>
+                    <span>- /1</span>
+                </div>
+                <div class="mission-item">
+                    <span>Fazer 500 pontos</span>
+                    <span>- /1</span>
+                </div>
+                <div class="mission-item">
+                    <span>Jogar um quizz</span>
+                    <span>- /1</span>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="btn-add" onclick="window.location.href='admin_criar_missoes.html'">Adicionar</button>
+                <button class="btn-remove">Remover</button>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modal">
+        <div class="modal-content">
+            <h2>Tem certeza que deseja sair?</h2>
+            <div class="modal-buttons">
+                <button class="btn-yes" id="confirmYes">Sim</button>
+                <button class="btn-no" id="confirmNo">Não</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Confirmação de Remoção -->
+    <div class="modal" id="remove-modal">
+        <div class="modal-content">
+            <p>Tem certeza que deseja remover esta missão?</p>
+            <div class="modal-buttons">
+                <button class="btn-cancel">Cancelar</button>
+                <button class="btn-confirm">Remover</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const logoutLink = document.getElementById('logout');
+        const modal = document.getElementById('modal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+    
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.add('show');
+        });
+    
+        confirmYes.addEventListener('click', () => {
+            window.location.href = '../index.html';
+        });
+    
+        confirmNo.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+
+        document.addEventListener("DOMContentLoaded", function () {
+            const removeButton = document.querySelector(".btn-remove");
+            const missionItems = document.querySelectorAll(".mission-item");
+            const removeModal = document.getElementById("remove-modal"); // Seleciona o modal correto
+            const btnCancel = removeModal.querySelector(".btn-cancel");
+            const btnConfirm = removeModal.querySelector(".btn-confirm");
+            let selectedMission = null;
+            let removingMode = false; // Controle de ativação do modo de remoção
+    
+            // Alternar o modo de remoção ao clicar no botão "Remover"
+            removeButton.addEventListener("click", function () {
+                removingMode = !removingMode; // Alterna entre ativado/desativado
+    
+                // Adiciona ou remove a classe de destaque nas missões
+                missionItems.forEach(item => {
+                    item.classList.remove("selectable"); // Limpa qualquer seleção anterior
+                    item.removeEventListener("click", selectMission);
+                    if (removingMode) {
+                        item.classList.add("selectable"); // Ativa modo de remoção
+                        item.addEventListener("click", selectMission);
+                    }
+                });
+    
+                // Se o modo de remoção for desativado, esconder o modal caso esteja aberto
+                if (!removingMode) {
+                    removeModal.style.display = "none";
+                }
+            });
+    
+            // Função para selecionar uma missão e exibir o modal de confirmação
+            function selectMission() {
+                if (removingMode) {
+                    selectedMission = this;
+                    removeModal.style.display = "flex";
+                }
+            }
+    
+            // Cancelar remoção
+            btnCancel.addEventListener("click", function () {
+                removeModal.style.display = "none";
+            });
+    
+            // Confirmar remoção
+            btnConfirm.addEventListener("click", function () {
+                if (selectedMission) {
+                    selectedMission.remove();
+                    removeModal.style.display = "none";
+                    removingMode = false; // Desativa o modo de remoção
+                    missionItems.forEach(item => item.classList.remove("selectable"));
+                }
+            });
+        });
+    </script>
+        
+</body>
+</html>

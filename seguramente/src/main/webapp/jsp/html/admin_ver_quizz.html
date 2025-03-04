@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Quiz - SeguraMente</title>
+    <style>
+        /* Reset básico */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #FBF9F9;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        .container {
+            display: flex;
+            height: 100%;
+            width: 100%;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #FFFFFF;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            color: #1935CA;
+            border-right: 1px solid #E0E0E0;
+        }
+
+        .sidebar h1 {
+            font-size: 26px;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: #1935CA;
+        }
+
+        .sidebar-item {
+            margin: 15px 0;
+            padding: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: #58595c;
+            text-decoration: none;
+            transition: background 0.3s, color 0.3s;
+        }
+
+        .sidebar-item:hover {
+            background: #E3EAFD;
+            color: #1935CA;
+        }
+
+        .sidebar-item.active {
+            background: #E3EAFD;
+            color: #1935CA;
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            background: #FBF9F9;
+            padding: 30px;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+
+        .search-container {
+            position: relative;
+            width: 700px;
+        }
+
+        .header .search-container input {
+            width: 100%;
+            height: 50px;
+            border: 1px solid #D1D1D1;
+            border-radius: 10px;
+            padding: 0 20px;
+            font-size: 16px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .header .create-quiz {
+            background: #1935CA;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+            text-decoration: none;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .profile img {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .profile span {
+            font-size: 16px;
+            font-weight: 600;
+            color: #5c5c5c;
+        }
+
+        .content h1 {
+            font-size: 24px;
+            font-weight: bold;
+            color: #1935CA;
+            margin-bottom: 30px;
+        }
+
+        .quiz-details {
+            background: #FFFFFF;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .quiz-question {
+            margin-bottom: 30px;
+        }
+
+        .quiz-question h2 {
+            font-size: 20px;
+            margin-bottom: 10px;
+            color: #1935CA;
+        }
+
+        .quiz-question img {
+            max-width: 100%;
+            height: auto;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            border: 1px solid #E0E0E0;
+        }
+
+        .quiz-question p {
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: #5C5C5C;
+        }
+
+        .quiz-options {
+            margin-left: 20px;
+        }
+
+        .quiz-options .correct {
+            color: green;
+            font-weight: bold;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .btn-accept {
+            background: #34C759;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-reject {
+            background: #FF3B30;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 24px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        .btn-accept:hover {
+            background: #28A745;
+        }
+
+        .btn-reject:hover {
+            background: #D32F2F;
+        }
+
+        /* Modal de Logout */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            visibility: hidden;
+            opacity: 0;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.show {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .modal-content {
+            background: #FFFFFF;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+            width: 400px;
+        }
+
+        .modal-content h2 {
+            font-size: 20px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .btn-yes {
+            background: #1935CA;
+            color: #FFFFFF;
+        }
+
+        .btn-no {
+            background: #E3EAFD;
+            color: #1935CA;
+        }
+
+        .btn-yes:hover {
+            background: #162E8E;
+        }
+
+        .btn-no:hover {
+            background: #C5D4F2;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>SeguraMente</h1>
+            <a href="admin_aprovar_quizz.html" class="sidebar-item">Jogos/ Quizzes</a>
+            <a href="admin_missoes.html" class="sidebar-item">Missões</a>
+            <a href="#" class="sidebar-item" id="logout">Sair</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-container">
+                    <input type="text" placeholder="Search Quiz">
+                </div>
+                <a href="admin_criar_quizz.html" class="create-quiz">Criar Quiz</a>
+                <a href="perfil.html" class="profile">
+                    <img src="imagens/avatar.png" alt="Avatar">
+                    <span>Pessoa</span>
+                </a>
+            </div>
+
+            <h1>Aprovar jogos/ Quizzes</h1>
+
+            <div class="quiz-details">
+                <div class="quiz-question">
+                    <h2>Pergunta 1:</h2>
+                    <img src="imagens/quiz-image.png" width="300px" height="300px" alt="Imagem da Pergunta">
+                    <p>Estás a usar o computador e recebes uma mensagem de alguém que não conheces a pedir o teu nome e morada. O que deves fazer?</p>
+                    <div class="quiz-options">
+                        <p>1. Responder rapidamente e dar as informações.</p>
+                        <p class="correct">2. Ignorar a mensagem e contar a um adulto. ✔</p>
+                        <p>3. Perguntar ao remetente quem ele é.</p>
+                        <p>4. Publicar as informações numa rede social.</p>
+                    </div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="btn-accept" onclick="aceitarQuiz()">Aceitar</button>
+                    <button class="btn-reject" onclick="recusarQuiz()">Recusar</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+        <!-- Modal -->
+        <div class="modal-overlay" id="modal">
+            <div class="modal-content">
+                <h2>Tem certeza que deseja sair?</h2>
+                <div class="modal-buttons">
+                    <button class="btn-yes" id="confirmYes">Sim</button>
+                    <button class="btn-no" id="confirmNo">Não</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal de Recusa -->
+        <div class="modal-overlay" id="modal-recusar">
+            <div class="modal-content">
+                <h2>Tem certeza que deseja recusar este quiz?</h2>
+                <div class="modal-buttons">
+                    <button class="btn-yes" id="recusarYes">Sim</button>
+                    <button class="btn-no" id="recusarNo">Não</button>
+                </div>
+            </div>
+        </div>
+
+
+    <script>
+        const logoutLink = document.getElementById('logout');
+        const modal = document.getElementById('modal');
+        const confirmYes = document.getElementById('confirmYes');
+        const confirmNo = document.getElementById('confirmNo');
+
+        logoutLink.addEventListener('click', (e) => {
+            e.preventDefault();
+            modal.classList.add('show');
+        });
+
+        confirmYes.addEventListener('click', () => {
+            window.location.href = '../index.html';
+        });
+
+        confirmNo.addEventListener('click', () => {
+            modal.classList.remove('show');
+        });
+    
+        function aceitarQuiz() {
+            const aceitarBtn = document.querySelector('.btn-accept');
+            const recusarBtn = document.querySelector('.btn-reject');
+            aceitarBtn.style.backgroundColor = '#28A745'; 
+            aceitarBtn.style.cursor = 'not-allowed';
+            aceitarBtn.disabled = true;
+    
+            recusarBtn.style.backgroundColor = '#D3D3D3'; 
+            recusarBtn.style.color = '#A9A9A9';
+            recusarBtn.style.cursor = 'not-allowed';
+            recusarBtn.disabled = true;
+    
+            const mensagem = document.createElement('div');
+            mensagem.textContent = 'Quiz aceito com sucesso!';
+            mensagem.style.color = '#34C759';
+            mensagem.style.fontWeight = 'bold';
+            mensagem.style.marginTop = '20px';
+            document.querySelector('.action-buttons').appendChild(mensagem);
+    
+            setTimeout(() => {
+                window.location.href = 'admin_aprovar_quizz.html';
+            }, 2000);
+        }
+    
+        const modalRecusar = document.getElementById('modal-recusar');
+        const recusarYes = document.getElementById('recusarYes');
+        const recusarNo = document.getElementById('recusarNo');
+
+        function recusarQuiz() {
+            modalRecusar.classList.add('show');
+        }
+
+        recusarYes.addEventListener('click', () => {
+            const aceitarBtn = document.querySelector('.btn-accept');
+            const recusarBtn = document.querySelector('.btn-reject');
+            recusarBtn.style.backgroundColor = '#D32F2F'; 
+            recusarBtn.style.cursor = 'not-allowed';
+            recusarBtn.disabled = true;
+
+            aceitarBtn.style.backgroundColor = '#D3D3D3'; 
+            aceitarBtn.style.color = '#A9A9A9';
+            aceitarBtn.style.cursor = 'not-allowed';
+            aceitarBtn.disabled = true;
+
+            const mensagem = document.createElement('div');
+            mensagem.textContent = 'Quiz recusado!';
+            mensagem.style.color = '#FF3B30';
+            mensagem.style.fontWeight = 'bold';
+            mensagem.style.marginTop = '20px';
+            document.querySelector('.action-buttons').appendChild(mensagem);
+
+            modalRecusar.classList.remove('show');
+            setTimeout(() => {
+                window.location.href = 'admin_aprovar_quizz.html';
+            }, 2000);
+        });
+
+        recusarNo.addEventListener('click', () => {
+            modalRecusar.classList.remove('show');
+        });
+    </script>
+    
+</body>
+</html>

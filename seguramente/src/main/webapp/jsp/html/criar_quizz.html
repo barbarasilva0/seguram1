@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criar Jogo/Quizz - SeguraMente</title>
+    <link rel="stylesheet" href="css/criar_quizz.css">
+
+</head>
+<body>
+    <div class="container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <h1>SeguraMente</h1>
+            <a href="dashboard.html" class="sidebar-item">Jogos Disponíveis</a>
+            <a href="missoes_semanais.html" class="sidebar-item">Missões Semanais</a>
+            <a href="historico.html" class="sidebar-item">Histórico</a>
+            <a href="#" class="sidebar-item" id="logout">Sair</a>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+            <!-- Header -->
+            <div class="header">
+                <div class="search-container">
+                    <img src="imagens/lupa.png" alt="Lupa" class="search-icon">
+                    <input type="text" placeholder="Pesquisar...">
+                </div>
+                <a href="criar_quizz.html" class="create-quiz">Criar Quizz</a>
+                <a href="perfil.html" class="profile">
+                    <img src="imagens/avatar.png" alt="Avatar">
+                    <span>Pessoa</span>
+                </a>
+            </div>
+
+            <!-- Quiz Section -->
+            <div class="quiz-section">
+                <h1 class="quiz-title">Criar o Jogo/Quizz</h1>
+
+                <div class="question-container" id="question-container">
+                    <div class="question" id="question-template">
+                        <button class="remove-question-btn" onclick="removeSpecificQuestion(this)">Remover</button>
+                        <div class="question-title">Pergunta 1</div>
+                        <div class="question-header">
+                            <textarea placeholder="Digite sua pergunta"></textarea>
+                            <label class="upload-container">
+                                <img class="image-preview" alt="Prévia da imagem">
+                                Clique para enviar
+                                <input type="file" accept="image/*" onchange="previewImage(event, this)">
+                            </label>
+                        </div>
+                        <div class="options">
+                            <div class="option">
+                                <input type="text" placeholder="Opção A">
+                                <input type="checkbox">
+                            </div>
+                            <div class="option">
+                                <input type="text" placeholder="Opção B">
+                                <input type="checkbox">
+                            </div>
+                            <div class="option">
+                                <input type="text" placeholder="Opção C">
+                                <input type="checkbox">
+                            </div>
+                            <div class="option">
+                                <input type="text" placeholder="Opção D">
+                                <input type="checkbox">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="buttons">
+                    <button class="btn" onclick="addQuestion()">Adicionar Pergunta</button>
+                </div>
+
+                <button class="btn" onclick="window.location.href='aprovar_jogo.html'">Finalizar Jogo/Quizz</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function previewImage(event, inputElement) {
+            const reader = new FileReader();
+            reader.onload = function () {
+                const preview = inputElement.previousElementSibling;
+                preview.src = reader.result;
+                preview.style.display = 'block';
+            };
+            reader.readAsDataURL(event.target.files[0]);
+        }
+
+        function updateQuestionNumbers() {
+            const questions = document.querySelectorAll('.question');
+            questions.forEach((question, index) => {
+                const title = question.querySelector('.question-title');
+                title.textContent = `Pergunta ${index + 1}`;
+            });
+        }
+
+        function addQuestion() {
+            const container = document.getElementById('question-container');
+            const newQuestion = document.getElementById('question-template').cloneNode(true);
+            newQuestion.querySelector('textarea').value = '';
+            newQuestion.querySelector('.image-preview').src = '';
+            newQuestion.querySelector('.image-preview').style.display = 'none';
+            newQuestion.querySelector('input[type="file"]').value = '';
+            container.appendChild(newQuestion);
+            updateQuestionNumbers();
+        }
+
+        function removeSpecificQuestion(button) {
+            const question = button.closest('.question');
+            question.remove();
+            updateQuestionNumbers();
+        }
+    </script>
+</body>
+</html>
