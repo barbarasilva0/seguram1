@@ -1,0 +1,318 @@
+/* Reset básico */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(135deg, #1a2a6c, #b21f1f, #fdbb2d);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+    text-align: center;
+    color: white;
+    overflow: hidden;
+}
+
+/* 🏠 Cabeçalho fixo */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 40px;
+    background: rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 1000;
+}
+
+header a.site-title {
+    font-size: 28px;
+    font-weight: 700;
+    color: #FFFFFF;
+    text-decoration: none;
+    transition: color 0.3s;
+}
+
+header a.site-title:hover {
+    color: #E0E0E0;
+}
+
+/* 📌 Container do lobby */
+.container {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    max-width: 90vw; /* Em vez de pixels fixos, usa % da largura da tela */
+    width: 90%;
+    margin-top: 10vh; /* Usa viewport height para manter espaçamento proporcional */
+    text-align: center;
+}
+
+/* 🏆 Título */
+h1 {
+    font-size: 28px;
+    color: #1935CA;
+    font-weight: 700;
+    margin-bottom: 10px;
+}
+
+/* 🔢 PIN destacado */
+.pin-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    margin: 15px 0;
+}
+
+.pin-box {
+    font-size: 45px;
+    font-weight: bold;
+    color: #ffffff; /* Define o texto como branco */
+    background: linear-gradient(90deg, #ff0099, #6e42e5, #4932D3); /* Fundo colorido */
+    padding: 20px 40px;
+    border-radius: 15px;
+    box-shadow: 0px 0px 25px rgba(255, 0, 153, 0.8); /* Brilho ao redor */
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    transition: all 0.3s ease-in-out;
+    animation: pulsar 1.5s infinite alternate;
+    display: inline-block;
+}
+
+/* ✨ Efeito de pulsação no PIN */
+@keyframes pulsar {
+    0% {
+        box-shadow: 0px 0px 15px rgba(255, 0, 153, 0.6);
+    }
+    100% {
+        box-shadow: 0px 0px 35px rgba(255, 0, 153, 1);
+        transform: scale(1.08);
+    }
+}
+
+/* 📲 QR Code */
+.qr-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+#qr-code {
+    width: 180px;
+    height: 180px;
+    border-radius: 10px;
+}
+
+/* 👥 Lista de jogadores */
+.players-container {
+    display: flex;  /* Usa Flexbox para garantir compatibilidade */
+    flex-wrap: wrap; /* Garante que os itens quebrem linha */
+    justify-content: center;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.player-box {
+    background: #1935CA;
+    color: white;
+    padding: 12px 18px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.15);
+    transition: transform 0.2s ease-in-out;
+}
+
+.player-box:hover {
+    transform: scale(1.05);
+}
+
+/* 🕹️ Botão iniciar */
+.start-button {
+    width: 60%;
+    padding: 14px;
+    font-size: 18px;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(45deg, #34C759, #28A745);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    margin-top: 20px;
+    box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.start-button:hover {
+    background: linear-gradient(45deg, #28A745, #34C759);
+    transform: scale(1.05);
+}
+
+/* ⛔ Estilização do alerta customizado */
+.custom-alert {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #FF3B30;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: bold;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.2);
+    display: none;
+    z-index: 2000;
+}
+
+.kick-btn {
+    background: #ff4d4d;
+    border: none;
+    color: white;
+    font-size: 14px;
+    margin-left: 10px;
+    padding: 4px 8px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+.kick-btn:hover {
+    background: #cc0000;
+}
+
+.alerta-erro {
+    position: fixed;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: #ff4d4f;
+    color: white;
+    padding: 16px 24px;
+    border-radius: 8px;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    z-index: 9999;
+    animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translate(-50%, -10px); }
+    to { opacity: 1; transform: translate(-50%, 0); }
+}
+
+.modal-expulsar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0,0,0,0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 999;
+}
+
+.modal-expulsar-content {
+    background: white;
+    padding: 30px;
+    border-radius: 12px;
+    text-align: center;
+    max-width: 400px;
+    width: 90%;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+}
+
+.modal-expulsar-content h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.modal-expulsar-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.btn-expulsar-confirm,
+.btn-expulsar-cancel {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.btn-expulsar-confirm {
+    background-color: #e74c3c;
+    color: white;
+}
+
+.btn-expulsar-cancel {
+    background-color: #ccc;
+    color: #333;
+}
+
+
+
+/* 📱 Responsividade para telas pequenas (até 768px - tablets e celulares) */
+@media screen and (max-width: 768px) {
+    .container {
+        padding: 20px;
+        width: 95%;
+        margin-top: 5vh;
+    }
+
+    h1 {
+        font-size: 22px; /* Reduz o título para evitar quebra */
+    }
+
+    .pin-box {
+        font-size: 30px; /* Ajusta o tamanho do PIN */
+        padding: 15px 25px;
+        letter-spacing: 3px;
+    }
+
+    .start-button {
+        width: 80%; /* Botão maior em telas menores */
+        font-size: 16px;
+        padding: 12px;
+    }
+
+    .player-box {
+        font-size: 14px;
+        padding: 8px 12px;
+    }
+
+    .qr-container {
+        margin-bottom: 15px;
+    }
+
+    #qr-code {
+        width: 150px;
+        height: 150px;
+    }
+    
+    .players-container {
+        justify-content: space-evenly; 
+    }
+
+    .player-box {
+        flex: 1 1 calc(50% - 10px); 
+        min-width: 120px;
+        text-align: center;
+    }
+}
