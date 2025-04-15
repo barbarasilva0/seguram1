@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SeguraMenteKIDS</title>
+    <link rel="stylesheet" href="css/index.css">
+    <link rel="icon" type="image/png" href="imagens/favicon.png">
+
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <h1>SeguraMente<span class="kids">KIDS</span></h1>
+        </div>
+        <nav>
+            <a href="php/login.php" class="button-blue">Entrar</a>
+            <a href="php/jogar_agora.php" class="button-white">Jogar Agora</a>
+        </nav>
+    </header>
+
+    <div class="hero">
+        <div class="text">
+            <h2>SeguraMente<span class="kids-text">KIDS</span></h2>
+            <p>Joga, Aprende e Protege-te Online!</p>
+            <p>Descobre a segurança digital de forma divertida e interativa.</p>
+        </div>
+        <div class="image">
+            <img src="imagens/imagem1.webp" alt="Imagem de um computador com segurança digital">
+        </div>
+    </div>
+
+    <div class="game-themes">
+        <h3>Temas dos jogos</h3>
+        <div class="carousel">
+            <span class="arrow left" onclick="prevSlide()">&#9664;</span>
+            <img src="imagens/pishing.webp" alt="Tema 1" class="active">
+            <img src="imagens/tema2.webp" alt="Tema 2">
+            <span class="arrow right" onclick="nextSlide()">&#9654;</span>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="image">
+            <img src="imagens/roubos.webp" alt="Fraudes Online">
+        </div>
+        <div class="text">
+            <h3>Reconhecer Fraudes Online</h3>
+            <p>Joga desafios interativos para identificar emails suspeitos e mensagens fraudulentas.</p>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="text">
+            <h3>Proteção de Palavras-Passe</h3>
+            <p>Aprende como criar palavras-passe fortes e seguras para proteger as tuas contas online.</p>
+        </div>
+        <div class="image">
+            <img src="imagens/password.webp" alt="Proteção de Palavras-Passe">
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 SeguraMente. Todos os direitos reservados.</p>
+        <p>
+            <a href="politicas.html" class="footer-link">Políticas de Privacidade</a> |
+            <a href="https://www.livroreclamacoes.pt/Inicio/" class="footer-link" target="_blank" rel="noopener noreferrer">Livro de Reclamações</a>
+        </p>
+    </footer>
+    
+    <script src="js/carousel.js"></script>
+</body>
+</html>
