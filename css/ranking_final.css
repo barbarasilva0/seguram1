@@ -1,0 +1,96 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
+    color: #fff;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.scoreboard-container {
+    background: rgba(255, 255, 255, 0.08);
+    padding: 50px 30px;
+    border-radius: 20px;
+    width: 90%;
+    max-width: 1000px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+    backdrop-filter: blur(15px);
+    text-align: center;
+}
+
+.scoreboard-container h1 {
+    font-size: 32px;
+    margin-bottom: 30px;
+    color: #fff;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.scoreboard-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    background-color: rgba(255,255,255,0.1);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.scoreboard-table th,
+.scoreboard-table td {
+    padding: 15px;
+    text-align: center;
+    font-size: 18px;
+}
+
+.scoreboard-table th {
+    background-color: rgba(255,255,255,0.2);
+    font-weight: 600;
+    color: #fff;
+}
+
+.scoreboard-table tr:nth-child(odd) {
+    background-color: rgba(255,255,255,0.05);
+}
+
+.scoreboard-table tr:hover {
+    background-color: rgba(255,255,255,0.15);
+}
+
+.conquistas {
+    font-size: 14px;
+    color: #ffdd57;
+    margin-top: 4px;
+    font-style: italic;
+    opacity: 0.9;
+}
+
+.btn-next {
+    display: inline-block;
+    margin-top: 30px;
+    padding: 14px 30px;
+    background-color: #00C897;
+    color: #fff;
+    font-size: 18px;
+    font-weight: bold;
+    border: none;
+    border-radius: 30px;
+    text-decoration: none;
+    transition: background 0.3s ease;
+}
+
+.btn-next:hover {
+    background-color: #00a67c;
+}
+
+a.btn-next:visited {
+    color: #fff;
+}
+
+p {
+    font-size: 18px;
+    color: #ddd;
+}
