@@ -108,17 +108,23 @@ function atualizarMissoesTodosJogadores($pin, $connJogos) {
             $idMissao = $missao['ID_Missao'];
             $objetivo = $missao['Objetivo'];
             $progresso = $missao['Progresso'];
-            $nome = strtolower($missao['Nome']);
+            $nome = strtolower(trim($missao['Nome'])); // mais robusto
 
             if ($progresso >= $objetivo) continue;
 
+            // Missão: Jogue quizzes
             if (strpos($nome, 'jogue') !== false) {
-                $u = $connJogos->prepare("UPDATE Missao_Semanal SET Progresso = Progresso + 1 WHERE ID_Missao = ?");
+                $u = $connJogos->prepare("
+                    UPDATE Missao_Semanal 
+                    SET Progresso = LEAST(Progresso + 1, Objetivo) 
+                    WHERE ID_Missao = ?
+                ");
                 $u->bind_param("i", $idMissao);
                 $u->execute();
                 $u->close();
             }
 
+            // Missão: Acerto mínimo de 80%
             if (strpos($nome, '80%') !== false && $percentagem >= 80) {
                 $u = $connJogos->prepare("UPDATE Missao_Semanal SET Progresso = 1 WHERE ID_Missao = ?");
                 $u->bind_param("i", $idMissao);
@@ -126,6 +132,7 @@ function atualizarMissoesTodosJogadores($pin, $connJogos) {
                 $u->close();
             }
 
+            // Missão: Participar em jogo multiplayer
             if (strpos($nome, 'multiplayer') !== false && $modo === 'multi') {
                 $u = $connJogos->prepare("UPDATE Missao_Semanal SET Progresso = 1 WHERE ID_Missao = ?");
                 $u->bind_param("i", $idMissao);
@@ -139,4 +146,52 @@ function atualizarMissoesTodosJogadores($pin, $connJogos) {
 
     $stmt->close();
 }
+
+function atualizarMissoesTodosJogadoresSolo($idUtilizador, $connJogos) {
+    // Total de quizzes jogados hoje pelo utilizador
+    $stmt = $connJogos->prepare("
+        SELECT COUNT(*) 
+        FROM Historico 
+        WHERE ID_Utilizador = ? AND DATE(Data) = CURDATE()
+    ");
+    $stmt->bind_param("i", $idUtilizador);
+    $stmt->execute();
+    $stmt->bind_result($quizzesHoje);
+    $stmt->fetch();
+    $stmt->close();
+
+    $m = $connJogos->prepare("
+        SELECT ID_Missao, Nome, Objetivo, Progresso 
+        FROM Missao_Semanal 
+        WHERE ID_Utilizador = ?
+    ");
+    $m->bind_param("i", $idUtilizador);
+    $m->execute();
+    $result = $m->get_result();
+
+    while ($missao = $result->fetch_assoc()) {
+        $idMissao = $missao['ID_Missao'];
+        $nome = strtolower(trim($missao['Nome']));
+        $objetivo = $missao['Objetivo'];
+        $progresso = $missao['Progresso'];
+
+        if ($progresso >= $objetivo) continue;
+
+        if (strpos($nome, 'jogue') !== false) {
+            $novoProgresso = min($quizzesHoje, $objetivo);
+            $u = $connJogos->prepare("UPDATE Missao_Semanal SET Progresso = ? WHERE ID_Missao = ?");
+            $u->bind_param("ii", $novoProgresso, $idMissao);
+            $u->execute();
+            $u->close();
+        }
+
+        if (strpos($nome, '80%') !== false) {
+            // Percentagem será calculada no PHP
+            // → Mantém esta parte no finalizar_solo.php se já está lá
+        }
+    }
+
+    $m->close();
+}
+
 ?>

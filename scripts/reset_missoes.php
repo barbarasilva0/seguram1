@@ -1,51 +1,66 @@
 <?php
 require_once '/home/seguram1/config.php';
 
-$conn = getDBJogos();
-$conn->set_charset("utf8mb4");
+$logPath = "/home/seguram1/cron_logs/reset_debug.log";
+file_put_contents($logPath, "Início do reset de missões semanais\n", FILE_APPEND);
 
-// Resetar progresso das missões semanais existentes
-$sql = "UPDATE Missao_Semanal SET Progresso = 0";
-if ($conn->query($sql) !== TRUE) {
-    die("Erro ao resetar missões: " . $conn->error);
+// Conexões separadas para cada base de dados
+$connUtilizadores = getDBUtilizadores();
+$connJogos = getDBJogos();
+
+if (!$connUtilizadores || !$connJogos) {
+    file_put_contents($logPath, "Erro: não foi possível conectar às bases de dados.\n", FILE_APPEND);
+    exit;
 }
 
-// (Opcional) Garantir que todos os utilizadores têm missões atribuídas
-function gerarMissoesIniciais($idUsuario, $conn) {
-    $stmt = $conn->prepare("SELECT COUNT(*) FROM Missao_Semanal WHERE ID_Utilizador = ?");
-    $stmt->bind_param("i", $idUsuario);
-    $stmt->execute();
-    $stmt->bind_result($qtd);
-    $stmt->fetch();
-    $stmt->close();
+// Buscar todos os utilizadores registados
+$res = $connUtilizadores->query("SELECT ID_Utilizador FROM Utilizador");
+if (!$res) {
+    file_put_contents($logPath, "Erro ao obter utilizadores: " . $connUtilizadores->error . "\n", FILE_APPEND);
+    exit;
+}
 
-    if ($qtd < 4) {
-        // Exemplo de missões básicas
-        $missoes = [
-            ['Jogue 3 quizzes esta semana', null, 3],
-            ['Obtenha 80% de acertos em um quiz', null, 1],
-            ['Participe de um jogo multiplayer', null, 1],
-            ['Criar um quiz', null, 1]
-        ];
+while ($row = $res->fetch_assoc()) {
+    $id = (int)$row['ID_Utilizador'];
+    file_put_contents($logPath, "Resetando missões do utilizador ID=$id\n", FILE_APPEND);
 
-        $stmt = $conn->prepare("INSERT INTO Missao_Semanal (Nome, Descricao, Objetivo, Progresso, ID_Utilizador) VALUES (?, ?, ?, 0, ?)");
-
-        foreach ($missoes as $missao) {
-            $stmt->bind_param("ssii", $missao[0], $missao[1], $missao[2], $idUsuario);
-            $stmt->execute();
+    // Apagar missões antigas
+    $delete = $connJogos->prepare("DELETE FROM Missao_Semanal WHERE ID_Utilizador = ?");
+    if ($delete) {
+        $delete->bind_param("i", $id);
+        if (!$delete->execute()) {
+            file_put_contents($logPath, "Erro ao apagar missões do utilizador $id: " . $delete->error . "\n", FILE_APPEND);
         }
-
-        $stmt->close();
+        $delete->close();
+    } else {
+        file_put_contents($logPath, "Erro ao preparar DELETE para $id: " . $connJogos->error . "\n", FILE_APPEND);
+        continue;
     }
+
+    // Inserir missões padrão
+    $missoes = [
+        ['Jogue 3 quizzes esta semana', null, 3],
+        ['Obtenha 80% de acertos em um quiz', null, 1],
+        ['Participe de um jogo multiplayer', null, 1],
+        ['Criar um quiz', null, 1]
+    ];
+
+    $insert = $connJogos->prepare("INSERT INTO Missao_Semanal (Nome, Descricao, Objetivo, Progresso, ID_Utilizador) VALUES (?, ?, ?, 0, ?)");
+    if (!$insert) {
+        file_put_contents($logPath, "Erro ao preparar INSERT: " . $connJogos->error . "\n", FILE_APPEND);
+        continue;
+    }
+
+    foreach ($missoes as $m) {
+        $insert->bind_param("ssii", $m[0], $m[1], $m[2], $id);
+        if (!$insert->execute()) {
+            file_put_contents($logPath, "Erro ao inserir missão para utilizador $id: " . $insert->error . "\n", FILE_APPEND);
+        }
+    }
+    $insert->close();
 }
 
-// Garantir que todos os utilizadores tenham missões
-$result = $conn->query("SELECT ID_Utilizador FROM Utilizador");
-while ($row = $result->fetch_assoc()) {
-    gerarMissoesIniciais($row['ID_Utilizador'], $conn);
-}
+$connUtilizadores->close();
+$connJogos->close();
 
-$conn->close();
-
-echo "✅ Missões semanais reiniciadas com sucesso.";
-?>
+file_put_contents($logPath, "Fim do reset de missões semanais\n", FILE_APPEND);

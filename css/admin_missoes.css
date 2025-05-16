@@ -202,7 +202,56 @@ body {
 .selectable {
     background: #FFEBEE;
     cursor: pointer;
-}    
+}  
+
+.mission-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 16px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    margin-bottom: 15px;
+}
+
+.mission-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.btn-edit {
+    background-color: #1935CA;
+    color: #fff;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-edit:hover {
+    background-color: #152ca1;
+}
+
+.btn-remove {
+    background-color: #dc3545;
+    color: white;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.3s ease;
+}
+
+.btn-remove:hover {
+    background-color: #b02a37;
+}
+
 
 /* Modal de Confirmação */
 .modal {
