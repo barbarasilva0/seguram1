@@ -77,6 +77,17 @@ $connJogos->close();
             </div>
 
             <h1>Criar Nova Missão</h1>
+            
+            <div class="alerta-admin">
+                <h3>Atenção:</h3>
+                <p>Para que as missões sejam interpretadas corretamente e o progresso dos jogadores seja atualizado automaticamente, utilize os seguintes formatos no <strong>nome da missão</strong>:</p>
+                <ul>
+                    <li><strong>Jogue</strong> — para contar jogos concluídos (ex: <em>Jogue 3 quizzes esta semana</em>)</li>
+                    <li><strong>Multiplayer</strong> — para reconhecer participação em jogos multiplayer(ex: <em>Participe de um jogo multiplayer</em>)</li>
+                    <li><strong>Criar</strong> — para reconhecer a criação de quizzes (ex: <em>Criar um quiz</em>)</li>
+                </ul>
+                <p>Qualquer outro nome será tratado como missão personalizada e <strong>não será atualizada automaticamente</strong>.</p>
+            </div>
 
             <?php if ($success) : ?>
                 <div class="success-message">

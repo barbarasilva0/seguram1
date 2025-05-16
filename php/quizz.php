@@ -175,35 +175,42 @@ if ($modoJogo === 'multi') {
     function renderPergunta() {
         const pergunta = perguntas[indiceAtual];
         if (!pergunta) return;
-
+    
         document.getElementById('quiz-texto').textContent = pergunta.Texto;
         const imgDiv = document.getElementById('imagem-pergunta');
         const img = document.getElementById('pergunta-img');
-
+    
         if (pergunta.Imagem && pergunta.Imagem.trim() !== "") {
             img.src = pergunta.Imagem.replace(/^(\.\.\/)+/, '../');
             imgDiv.style.display = 'block';
         } else {
             imgDiv.style.display = 'none';
         }
-
+    
         const opcoesDiv = document.getElementById('quiz-opcoes');
         opcoesDiv.innerHTML = '';
-
-        const opcoes = pergunta.Opcoes.split(', ');
+    
+        let opcoes = [];
+        try {
+            opcoes = JSON.parse(pergunta.Opcoes);
+        } catch (e) {
+            console.error("Erro ao interpretar opções:", e);
+            opcoes = [];
+        }
+    
         const interval = iniciarTimer(resposta => registrarResposta(resposta, true));
-
+    
         opcoes.forEach(opcao => {
             const btn = document.createElement('button');
             btn.type = 'button';
             btn.className = 'quiz-option';
             btn.textContent = opcao;
-
+    
             btn.addEventListener('click', () => {
                 clearInterval(interval);
                 registrarResposta(opcao);
             });
-
+    
             opcoesDiv.appendChild(btn);
         });
     }
@@ -214,6 +221,7 @@ if ($modoJogo === 'multi') {
         const correta = pergunta.Resposta_Correta;
         const pontosTotais = parseInt(pergunta.Pontos);
         let pontosGanhos = 0;
+
         let acertou = resposta === correta;
 
         if (acertou) {
@@ -221,6 +229,8 @@ if ($modoJogo === 'multi') {
                 ? Math.ceil(pontosTotais / 2)
                 : Math.max(Math.ceil(pontosTotais * ((tempoMaximo - tempo) / tempoMaximo)), Math.ceil(pontosTotais / 2));
         }
+        
+        totalPontos += pontosGanhos;
 
         if (modo === "multi") {
             fetch("registar_resposta.php", {
@@ -231,7 +241,13 @@ if ($modoJogo === 'multi') {
                 aguardarTodosResponderem();
             });
         } else {
-            mostrarFeedbackSolo(acertou, correta);
+            fetch("registar_historico_solo.php", {
+                method: "POST",
+                headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                body: `id_pergunta=${pergunta.ID_Pergunta}&resposta=${encodeURIComponent(resposta || '')}&tempo=${tempo}`
+            }).then(() => {
+                mostrarFeedbackSolo(acertou, correta);
+            });
         }
     }
 
@@ -261,7 +277,7 @@ if ($modoJogo === 'multi') {
                     if (data.todosResponderam) {
                         clearInterval(intervalo);
     
-                        // ✅ Se for a última pergunta → vai direto para o ranking
+                        // Se for a última pergunta → vai direto para o ranking
                         if (perguntaID === ultimaPerguntaID) {
                             window.location.href = `ranking_final.php?pin=${pin}`;
                         } else {
@@ -293,21 +309,20 @@ if ($modoJogo === 'multi') {
                 renderPergunta();
             } else {
                 const container = document.querySelector(".quiz-container");
-                container.innerHTML = `
-                    <div class="quiz-fim-container">
-                        <h2>Quiz concluído!</h2>
-                        <p>Parabéns por concluir o quiz! O que deseja fazer a seguir?</p>
-                        <div class="quiz-buttons">
-                            <a href="dashboard.php" class="next-button">Ir para o Dashboard</a>
-                        </div>
-                    </div>`;
+                fetch("guardar_pontuacao_solo.php", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+                    body: `pontuacao=${totalPontos}`
+                }).then(() => {
+                    window.location.href = `finalizar_solo.php?id=<?= $idJogo ?>`;
+                });
             }
         }, 2500);
     }
 
     renderPergunta();
     
-    // ✅ Enviar heartbeat mesmo durante o quizz
+    // Enviar heartbeat mesmo durante o quizz
     setInterval(() => {
         fetch("heartbeat.php", {
             method: "POST",

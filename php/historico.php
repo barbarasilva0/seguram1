@@ -147,7 +147,7 @@ $connJogos->close();
                                 <?php foreach ($historico as $row): ?>
                                     <tr>
                                         <td><?php echo htmlspecialchars($row["quizName"]); ?></td>
-                                        <td><?php echo date("d/m/Y", strtotime($row["Data"])); ?></td>
+                                        <td><?php echo date("d/m/Y H:i", strtotime($row["Data"])); ?></td>
                                         <td><?php echo htmlspecialchars($row["Pontuacao_Obtida"]); ?></td>
                                         <td><?php echo htmlspecialchars($row["totalPerguntas"]); ?></td>
                                     </tr>

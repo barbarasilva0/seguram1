@@ -13,33 +13,42 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $password = trim($_POST["password"]);
     $tipoUsuario = "jogador";
 
+    // Validação de campos
     if (empty($nome) || empty($username) || empty($email) || empty($password)) {
-        die("Erro: Todos os campos são obrigatórios.");
+        $_SESSION['erro_registo'] = "Todos os campos são obrigatórios.";
+        header("Location: register.php");
+        exit();
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        die("Erro: Formato de email inválido.");
+        $_SESSION['erro_registo'] = "Formato de email inválido.";
+        header("Location: register.php");
+        exit();
     }
 
+    // Verificar se já existe email ou username
     $stmt = $conn->prepare("SELECT ID_Utilizador FROM Utilizador WHERE Email = ? OR Username = ?");
     $stmt->bind_param("ss", $email, $username);
     $stmt->execute();
     $stmt->store_result();
 
     if ($stmt->num_rows > 0) {
-        die("Erro: Este email ou username já estão registados.");
+        $_SESSION['erro_registo'] = "Este email ou username já estão registados.";
+        $stmt->close();
+        header("Location: register.php");
+        exit();
     }
     $stmt->close();
 
+    // Criar utilizador
     $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
     $stmt = $conn->prepare("INSERT INTO Utilizador (Nome, Username, Email, Password, Tipo_de_Utilizador) VALUES (?, ?, ?, ?, ?)");
     $stmt->bind_param("sssss", $nome, $username, $email, $passwordHash, $tipoUsuario);
 
     if ($stmt->execute()) {
         $idUsuario = $stmt->insert_id;
 
-        // Criar perfil associado ao novo utilizador
+        // Criar perfil
         $perfilStmt = $conn->prepare("INSERT INTO Perfil (Pontuacao_Total, Conquistas, ID_Utilizador) VALUES (0, '', ?)");
         $perfilStmt->bind_param("i", $idUsuario);
         $perfilStmt->execute();
@@ -52,24 +61,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         gerarMissoesIniciais($idUsuario, $connJogos);
 
-        // Associar dados anteriores se vier de um quiz
+        // Atualizar dados se vier de um quiz
         if (isset($_GET['pin']) && is_numeric($_GET['pin']) && isset($_SESSION['nicknameTemporario'])) {
             $pin = intval($_GET['pin']);
             $nicknameTemp = $_SESSION['nicknameTemporario'];
 
-            // Atualizar RespostasJogador
             $j = $connJogos->prepare("UPDATE RespostasJogador SET ID_Utilizador = ? WHERE PIN = ? AND ID_Utilizador IS NULL AND Nickname = ?");
             $j->bind_param("iis", $idUsuario, $pin, $nicknameTemp);
             $j->execute();
             $j->close();
 
-            // Atualizar JogadoresLobby
             $jl = $connJogos->prepare("UPDATE JogadoresLobby SET ID_Utilizador = ?, Tipo = 'registado' WHERE PIN = ? AND Nickname = ?");
             $jl->bind_param("iis", $idUsuario, $pin, $nicknameTemp);
             $jl->execute();
             $jl->close();
 
-            // Limpar da sessão
             unset($_SESSION['nicknameTemporario']);
         }
 
@@ -80,11 +86,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         header("Location: dashboard.php");
         exit();
     } else {
-        die("Erro ao registar utilizador: " . $conn->error);
+        $_SESSION['erro_registo'] = "Erro ao registar utilizador: " . $conn->error;
+        header("Location: register.php");
+        exit();
     }
 }
+
 $conn->close();
 ?>
+
 
 
 <!DOCTYPE html>
@@ -98,12 +108,21 @@ $conn->close();
     
 </head>
 <body>
+    <?php
+    $mensagemErro = $_SESSION['erro_registo'] ?? null;
+    unset($_SESSION['erro_registo']);
+    ?>
+
     <div class="container">
         <!-- Lado Esquerdo com Imagem -->
         <div class="left"></div>
 
         <!-- Lado Direito com Formulário -->
         <div class="right">
+            <?php if ($mensagemErro): ?>
+                <div class="alert-error"><?= htmlspecialchars($mensagemErro) ?></div>
+            <?php endif; ?>
+
             <div class="site-title">
                 <a href="../index.html" class="site-title-link">
                   SeguraMente<span class="kids-text">KIDS</span>

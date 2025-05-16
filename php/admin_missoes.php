@@ -25,20 +25,30 @@ if ($result->num_rows > 0) {
     }
 }
 
-// 📌 Processar remoção de missão
+// Processar remoção de missão
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['idMissao'])) {
     $idMissao = intval($_POST['idMissao']);
 
-    // Remover a missão da tabela
-    $stmt = $connJogos->prepare("DELETE FROM Missao_Semanal WHERE ID_Missao = ?");
+    // Obter o nome da missão correspondente ao ID
+    $stmt = $connJogos->prepare("SELECT Nome FROM Missao_Semanal WHERE ID_Missao = ?");
     $stmt->bind_param("i", $idMissao);
     $stmt->execute();
+    $stmt->bind_result($nomeMissao);
+    $stmt->fetch();
     $stmt->close();
 
-    // Recarregar a página para refletir a remoção
-    header("Location: admin_missoes.php");
+    if (!empty($nomeMissao)) {
+        // Remover todas as entradas com o mesmo nome
+        $stmt = $connJogos->prepare("DELETE FROM Missao_Semanal WHERE Nome = ?");
+        $stmt->bind_param("s", $nomeMissao);
+        $stmt->execute();
+        $stmt->close();
+    }
+
+    header("Location: admin_missoes.php?removida=1");
     exit();
 }
+
 
 $connJogos->close();
 ?>
@@ -82,7 +92,11 @@ $connJogos->close();
                         <div class="mission-item">
                             <span><?php echo htmlspecialchars($missao['Nome']); ?></span>
                             <span><?php echo $missao['Progresso']; ?> / <?php echo htmlspecialchars($missao['Objetivo']); ?></span>
-                            <button class="btn-remove" data-id="<?php echo $missao['ID_Missao']; ?>">Remover</button>
+                            
+                            <div class="mission-actions">
+                                <a href="admin_editar_missao.php?id=<?php echo $missao['ID_Missao']; ?>" class="btn-edit">Editar</a>
+                                <button class="btn-remove" data-id="<?php echo $missao['ID_Missao']; ?>">Remover</button>
+                            </div>
                         </div>
                     <?php endforeach; ?>
                 <?php else : ?>

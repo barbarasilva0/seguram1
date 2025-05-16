@@ -1,7 +1,7 @@
 <?php
 session_start();
 require_once '/home/seguram1/config.php';
-include '../components/user_info.php'; 
+include '../components/user_info.php';
 
 if (!isset($_SESSION['idUsuario'])) {
     header("Location: login.php");
@@ -17,12 +17,14 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $pontosTotais = intval($_POST['pontosTotais']);
     $idCriador = $_SESSION['idUsuario'];
 
+    // Criar o Jogo
     $stmt = $conn->prepare("INSERT INTO Jogo (Nome, Estado, Descricao, Criado_por) VALUES (?, 'Pendente', ?, ?)");
     $stmt->bind_param("ssi", $nomeJogo, $descricaoJogo, $idCriador);
     $stmt->execute();
     $idJogo = $stmt->insert_id;
     $stmt->close();
 
+    // Diretório de upload
     $uploadDir = "../uploads/";
     if (!is_dir($uploadDir)) {
         mkdir($uploadDir, 0777, true);
@@ -33,22 +35,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
     foreach ($_POST['perguntas'] as $index => $perguntaTexto) {
         if (!empty($perguntaTexto)) {
-            $opcoes = implode(", ", array_map('htmlspecialchars', $_POST['opcoes'][$index]));
-            $respostaCorreta = htmlspecialchars($_POST['respostaCorreta'][$index] ?? "");
+            // Obter e sanitizar opções
+            $opcoesSanitizadas = array_map('htmlspecialchars', $_POST['opcoes'][$index]);
+            $opcoesString = json_encode($opcoesSanitizadas, JSON_UNESCAPED_UNICODE);
 
-            $imagemPath = null; 
+            // Obter o índice da resposta correta
+            $respostaIndex = $_POST['respostaCorreta'][$index] ?? null;
+            $respostaCorreta = ($respostaIndex !== null && isset($opcoesSanitizadas[$respostaIndex]))
+                ? $opcoesSanitizadas[$respostaIndex]
+                : null;
+
+            // Lidar com upload de imagem
+            $imagemPath = null;
             if (!empty($_FILES['imagens']['name'][$index])) {
                 $fileName = time() . "_" . basename($_FILES['imagens']['name'][$index]);
-                $imagemPath = $uploadDir . $fileName;
-                if (move_uploaded_file($_FILES['imagens']['tmp_name'][$index], $imagemPath)) {
-                    $imagemPath = htmlspecialchars($imagemPath);
-                } else {
-                    $imagemPath = null;
+                $fullPath = $uploadDir . $fileName;
+                if (move_uploaded_file($_FILES['imagens']['tmp_name'][$index], $fullPath)) {
+                    $imagemPath = htmlspecialchars($fullPath);
                 }
             }
 
+            // Inserir pergunta na BD
             $stmt = $conn->prepare("INSERT INTO Pergunta (Texto, Opcoes, Resposta_Correta, Pontos, ID_Jogo, Imagem) VALUES (?, ?, ?, ?, ?, ?)");
-            $stmt->bind_param("sssiss", $perguntaTexto, $opcoes, $respostaCorreta, $pontosPorPergunta, $idJogo, $imagemPath);
+            $stmt->bind_param("sssiss", $perguntaTexto, $opcoesString, $respostaCorreta, $pontosPorPergunta, $idJogo, $imagemPath);
             $stmt->execute();
             $stmt->close();
         }
@@ -59,6 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     exit();
 }
 ?>
+
 
 <!DOCTYPE html>
 <html lang="pt-PT">
@@ -132,31 +142,31 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                                     </label>
                                 </div>
                             </div>
-                            <div class="options">
-                                <div class="option">
-                                    <input type="text" name="opcoes[0][]" placeholder="Opção A" required>
-                                    <input type="radio" name="respostaCorreta[0]" value="A" required>
+                                <div class="options">
+                                    <div class="option">
+                                        <input type="text" name="opcoes[0][]" placeholder="Opção A" required>
+                                        <input type="radio" name="respostaCorreta[0]" value="0">
+                                    </div>
+                                    <div class="option">
+                                        <input type="text" name="opcoes[0][]" placeholder="Opção B" required>
+                                        <input type="radio" name="respostaCorreta[0]" value="1">
+                                    </div>
+                                    <div class="option">
+                                        <input type="text" name="opcoes[0][]" placeholder="Opção C">
+                                        <input type="radio" name="respostaCorreta[0]" value="2">
+                                    </div>
+                                    <div class="option">
+                                        <input type="text" name="opcoes[0][]" placeholder="Opção D">
+                                        <input type="radio" name="respostaCorreta[0]" value="3">
+                                    </div>
                                 </div>
-                                <div class="option">
-                                    <input type="text" name="opcoes[0][]" placeholder="Opção B" required>
-                                    <input type="radio" name="respostaCorreta[0]" value="B">
-                                </div>
-                                <div class="option">
-                                    <input type="text" name="opcoes[0][]" placeholder="Opção C">
-                                    <input type="radio" name="respostaCorreta[0]" value="C">
-                                </div>
-                                <div class="option">
-                                    <input type="text" name="opcoes[0][]" placeholder="Opção D">
-                                    <input type="radio" name="respostaCorreta[0]" value="D">
-                                </div>
-                            </div>
                         </div>
                     </div>
                     <div id="alert-box" class="alert"></div>
                     <div class="buttons">
                         <button type="button" class="btn" onclick="addQuestion()">Adicionar Pergunta</button>
                     </div>
-                    <button type="submit" class="btn">Finalizar Jogo/Quizz</button>
+                    <button type="button" class="btn" onclick="validarFormulario()">Finalizar Jogo/Quizz</button>
                 </form>
             </div>
         </div>
@@ -207,14 +217,19 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             const questionBlocks = document.querySelectorAll('.question-block');
             questionBlocks.forEach((block, index) => {
                 block.querySelector('.question-title').textContent = `Pergunta ${index + 1}`;
-                block.querySelectorAll('.options input[type="radio"]').forEach(radio => {
+                const radios = block.querySelectorAll('.options input[type="radio"]');
+                radios.forEach((radio, i) => {
                     radio.name = `respostaCorreta[${index}]`;
+                    radio.value = i;
                 });
-                block.querySelectorAll('.options input[type="text"]').forEach(input => {
-                    input.name = `opcoes[${index}][]`;
+        
+                const texts = block.querySelectorAll('.options input[type="text"]');
+                texts.forEach(text => {
+                    text.name = `opcoes[${index}][]`;
                 });
             });
         }
+
 
         function addQuestion() {
             const container = document.getElementById('question-container');
@@ -254,6 +269,29 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 alertBox.style.display = "none";
             }, 3000);
         }
+        
+        function validarFormulario() {
+            const questionBlocks = document.querySelectorAll('.question-block');
+            let valido = true;
+        
+            questionBlocks.forEach((block, index) => {
+                const radios = block.querySelectorAll('input[type="radio"]');
+                const algumSelecionado = Array.from(radios).some(radio => radio.checked);
+        
+                if (!algumSelecionado) {
+                    valido = false;
+                }
+            });
+        
+            if (!valido) {
+                showAlert("Certifique-se de que todas as perguntas têm uma resposta correta selecionada.");
+                return;
+            }
+        
+            // Se tudo estiver ok, envia o formulário
+            document.querySelector('form').submit();
+        }
+
     </script>
 </body>
 </html>

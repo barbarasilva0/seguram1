@@ -68,12 +68,25 @@ while ($row = $result->fetch_assoc()) {
         $pontuacao = round($pontuacaoOriginal * 0.4); 
     
         // Historico
-        $h = $conn->prepare("INSERT INTO Historico (Data, Pontuacao_Obtida, Estado, ID_Utilizador, ID_Jogo)
-                             VALUES (NOW(), ?, 'Concluído', ?, ?)");
-        $h->bind_param("iii", $pontuacao, $idUtilizador, $idJogo);
-        $h->execute();
-        $h->close();
-    
+        $check = $conn->prepare("
+            SELECT COUNT(*) FROM Historico 
+            WHERE ID_Utilizador = ? AND ID_Jogo = ? AND DATE(Data) = CURDATE()
+        ");
+        $check->bind_param("ii", $idUtilizador, $idJogo);
+        $check->execute();
+        $check->bind_result($jaExiste);
+        $check->fetch();
+        $check->close();
+        
+        if ($jaExiste == 0) {
+            $h = $conn->prepare("INSERT INTO Historico (Data, Pontuacao_Obtida, Estado, ID_Utilizador, ID_Jogo)
+                                 VALUES (NOW(), ?, 'Concluído', ?, ?)");
+            $h->bind_param("iii", $pontuacao, $idUtilizador, $idJogo);
+            $h->execute();
+            $h->close();
+        }
+
+
         // Ranking
         $r = $conn->prepare("SELECT ID_Ranking FROM Ranking WHERE ID_Utilizador = ?");
         $r->bind_param("i", $idUtilizador);
@@ -199,7 +212,7 @@ $anonimo = empty($_SESSION['idUsuario']);
 
     <?php if ($anonimo): ?>
         <div style="text-align:center; margin-top:30px;">
-            <p>Gostaste do jogo? Cria uma conta para acompanhar tua pontuação e ganhar conquistas! 🎉</p>
+            <p>Gostaste do jogo? Cria uma conta para acompanhar tua pontuação e ganhar conquistas! </p>
             <a href="register.php" class="btn-next">Criar Conta</a>
         </div>
     <?php endif; ?>

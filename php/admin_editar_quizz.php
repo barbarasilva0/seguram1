@@ -94,7 +94,10 @@ $connJogos->close();
                     <div id="question-container">
                         <?php foreach ($perguntas as $index => $pergunta): ?>
                             <?php
-                                $opcoesArray = explode(', ', $pergunta['Opcoes']);
+                                $opcoesArray = json_decode($pergunta['Opcoes'], true);
+                                if (!is_array($opcoesArray)) {
+                                    $opcoesArray = []; 
+                                }   
                                 $respostaCorreta = $pergunta['Resposta_Correta'];
                             ?>
                             <div class="question-block">

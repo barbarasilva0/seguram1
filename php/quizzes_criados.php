@@ -123,6 +123,28 @@ $connJogos->close();
                     </div>
                     <a href="editar_perfil.php" class="edit-profile-btn">Editar Perfil</a>
                 </div>
+                
+                <?php if (isset($_GET['sucesso']) && $_GET['sucesso'] === 'removido'): ?>
+                    <div class="alert success">Quiz removido com sucesso.</div>
+                <?php elseif (isset($_GET['erro'])): ?>
+                    <div class="alert error">
+                        <?php
+                        switch ($_GET['erro']) {
+                            case 'invalid_id':
+                                echo "ID do quiz inválido.";
+                                break;
+                            case 'unauthorized':
+                                echo "Não tem permissão para remover este quiz.";
+                                break;
+                            case 'delete_fail':
+                                echo "Erro ao remover o quiz. Tente novamente.";
+                                break;
+                            default:
+                                echo "Ocorreu um erro.";
+                        }
+                        ?>
+                    </div>
+                <?php endif; ?>
 
                 <!-- Tabs -->
                 <div class="tabs">
@@ -154,13 +176,17 @@ $connJogos->close();
                                     ?>">
                                         <?php echo ucfirst($quiz['Estado']); ?>
                                     </td>
-                                    <td class="center-actions">
-                                        <?php if ($quiz['Estado'] === 'Aprovado'): ?>
-                                            <a href="editar_quizz.php?id=<?php echo $quiz['ID_Jogo']; ?>" class="btn-edit">Editar</a>
-                                        <?php else: ?>
-                                            <span style="color: #aaa;">---</span>
-                                        <?php endif; ?>
-                                    </td>
+                                        <td class="center-actions">
+                                            <?php if ($quiz['Estado'] === 'Aprovado'): ?>
+                                                <a href="editar_quizz.php?id=<?php echo $quiz['ID_Jogo']; ?>" class="btn-action btn-edit">Editar</a>
+                                                <form method="POST" action="remover_quizz_utilizador.php" class="remover-form" data-quiz-id="<?php echo intval($quiz['ID_Jogo']); ?>">
+                                                    <input type="hidden" name="id_quizz" value="<?php echo intval($quiz['ID_Jogo']); ?>">
+                                                    <button type="button" class="btn-action btn-remove">Remover</button>
+                                                </form>
+                                            <?php else: ?>
+                                                <span style="color: #aaa;">---</span>
+                                            <?php endif; ?>
+                                        </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
@@ -171,6 +197,18 @@ $connJogos->close();
             </div>
         </div>
     </div>
+    
+    <!-- Modal de Confirmação de Remoção -->
+    <div class="modal-overlay" id="modal-remover">
+        <div class="modal-content">
+            <h2>Tens a certeza que queres remover este quiz?</h2>
+            <div class="modal-buttons">
+                <button class="btn-yes" id="confirmRemoveYes">Sim</button>
+                <button class="btn-no" id="confirmRemoveNo">Não</button>
+            </div>
+        </div>
+    </div>
+
 
     <!-- Modal de Logout -->
     <div class="modal-overlay" id="modal">
@@ -200,6 +238,36 @@ $connJogos->close();
 
         confirmNo.addEventListener('click', () => {
             modal.classList.remove('show');
+        });
+        
+        let formToSubmit = null;
+
+        document.querySelectorAll('.remover-form .btn-remove').forEach(button => {
+            button.addEventListener('click', function () {
+                formToSubmit = this.closest('form');
+                document.getElementById('modal-remover').classList.add('show');
+            });
+        });
+    
+        document.getElementById('confirmRemoveYes').addEventListener('click', () => {
+            if (formToSubmit) formToSubmit.submit();
+        });
+    
+        document.getElementById('confirmRemoveNo').addEventListener('click', () => {
+            document.getElementById('modal-remover').classList.remove('show');
+            formToSubmit = null;
+        });
+        
+        // Remover automaticamente alertas após 4 segundos
+        window.addEventListener("DOMContentLoaded", () => {
+            const alertBox = document.querySelector(".alert");
+            if (alertBox) {
+                setTimeout(() => {
+                    alertBox.style.opacity = "0";
+                    alertBox.style.transform = "translateY(-10px)";
+                    setTimeout(() => alertBox.remove(), 500); // remove após fade-out
+                }, 4000);
+            }
         });
     </script>
 </body>

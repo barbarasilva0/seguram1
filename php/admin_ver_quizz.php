@@ -44,12 +44,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['acao'])) {
         
             // Atualizar missão: adicionar +1 até ao máximo (Objetivo)
             $stmtMissao = $connMissoes->prepare("
-                UPDATE Missao_Semanal 
-                SET Progresso = LEAST(Progresso + 1, Objetivo) 
-                WHERE ID_Utilizador = ? AND Nome = 'Criar um quiz'
+                SELECT ID_Missao, Nome, Progresso, Objetivo 
+                FROM Missao_Semanal 
+                WHERE ID_Utilizador = ?
             ");
             $stmtMissao->bind_param("i", $idCriador);
             $stmtMissao->execute();
+            $resultMissoes = $stmtMissao->get_result();
+            
+            while ($missao = $resultMissoes->fetch_assoc()) {
+                $idMissao = $missao['ID_Missao'];
+                $nome = strtolower(trim($missao['Nome']));
+                $progresso = $missao['Progresso'];
+                $objetivo = $missao['Objetivo'];
+            
+                if ($progresso >= $objetivo) continue;
+            
+                if (strpos($nome, 'criar') !== false) {
+                    $update = $connMissoes->prepare("
+                        UPDATE Missao_Semanal 
+                        SET Progresso = LEAST(Progresso + 1, Objetivo) 
+                        WHERE ID_Missao = ?
+                    ");
+                    $update->bind_param("i", $idMissao);
+                    $update->execute();
+                    $update->close();
+                }
+            }
             $stmtMissao->close();
         }
 
@@ -144,7 +165,7 @@ $connJogos->close();
                 
                             <div class="quiz-options">
                                 <?php
-                                $opcoes = explode(", ", $pergunta['Opcoes']);
+                                $opcoes = json_decode($pergunta['Opcoes'], true);
                                 foreach ($opcoes as $opcao):
                                     $correta = ($opcao === $pergunta['Resposta_Correta']) ? 'style="font-weight: bold; color: green;"' : '';
                                 ?>
