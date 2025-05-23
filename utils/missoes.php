@@ -185,10 +185,7 @@ function atualizarMissoesTodosJogadoresSolo($idUtilizador, $connJogos) {
             $u->close();
         }
 
-        if (strpos($nome, '80%') !== false) {
-            // Percentagem será calculada no PHP
-            // → Mantém esta parte no finalizar_solo.php se já está lá
-        }
+
     }
 
     $m->close();
